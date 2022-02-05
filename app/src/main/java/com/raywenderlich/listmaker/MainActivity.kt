@@ -1,5 +1,6 @@
 package com.raywenderlich.listmaker
 
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -73,19 +74,39 @@ class MainActivity : AppCompatActivity(), MainFragment.MainFragmentInteractionLi
     }
 
     private fun showListDetail(list: TaskList) {
-        // 1
-        val listDetailIntent = Intent(this, ListDetailActivity::class.java)
-        // 2
+        val listDetailIntent = Intent(this,
+            ListDetailActivity::class.java)
         listDetailIntent.putExtra(INTENT_LIST_KEY, list)
-        // 3
-        startActivity(listDetailIntent)
+        startActivityForResult(listDetailIntent,
+            LIST_DETAIL_REQUEST_CODE)
     }
 
     override fun listItemTapped(list: TaskList) {
         showListDetail(list)
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int,
+                                  data:
+                                  Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        // 1
+        if (requestCode == LIST_DETAIL_REQUEST_CODE && resultCode ==
+            Activity.RESULT_OK) {
+            // 2
+            data?.let {
+                // 3
+
+                viewModel.updateList(data.getParcelableExtra(INTENT_LIST_KEY)!!)
+                viewModel.refreshLists()
+            }
+        }
+    }
+
+
+
     companion object {
         const val INTENT_LIST_KEY = "list"
+        const val LIST_DETAIL_REQUEST_CODE = 123
     }
+
 }
